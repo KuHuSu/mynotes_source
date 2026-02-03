@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "author": "KuHuSu <18385949367@163.com>",
+  "scripts": {
+    "dev": "umi dev",
+    "build": "node scripts/gen-list.js && umi build",
+    "postinstall": "umi setup",
+    "setup": "umi setup",
+    "start": "node scripts/gen-list.js && umi dev",
+    "deploy": "pnpm build && gh-pages -d dist -b main -r git@github.com:KuHuSu/kuhusu.github.io.git",
+    "push-all": "git add . && git commit -m 'update notes' && git push && pnpm deploy"
+  },
+  "dependencies": {
+    "antd": "^6.2.3",
+    "react-markdown": "^10.1.0",
+    "umi": "^4.6.25"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.33",
+    "@types/react-dom": "^18.0.11",
+    "@umijs/plugins": "^4.6.25",
+    "cross-env": "^10.1.0",
+    "gh-pages": "^6.3.0",
+    "typescript": "^5.0.3"
+  }
+}

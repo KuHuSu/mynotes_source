@@ -1,0 +1,19 @@
+import { defineConfig } from "umi";
+
+export default defineConfig({
+  routes: [
+    { path: "/", component: "index" },
+    { path: "/docs", component: "docs" },
+  ],
+  plugins: [
+    '@umijs/plugins/dist/antd'
+  ],
+
+  // 2. 开启 antd 配置
+  antd: {},
+  npmClient: 'pnpm',
+  history: { type: 'hash' },
+  base: '/',
+  publicPath: '/',
+  outputPath: 'dist',
+});
