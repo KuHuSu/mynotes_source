@@ -1,6 +1,9 @@
 import { defineConfig } from "umi";
 
 export default defineConfig({
+
+  title: 'KHS`s Notes | 学习记录',
+  
   routes: [
     { path: "/", component: "index" },
     { path: "/docs", component: "docs" },
