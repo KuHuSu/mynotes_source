@@ -1,47 +1,102 @@
-/* markdown-styles.css */
-
-/* 1. 基础容器设置 */
-.markdown-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 1.6; /* 增加行高，阅读更舒适 */
-  color: #24292e;   /* 深灰色字体，比纯黑更护眼 */
-  word-wrap: break-word;
+/* ==========================================================================
+   1. 全局基础与滚动条美化 (Global & Scrollbars)
+   ========================================================================== */
+body {
+  margin: 0;
+  background-color: #f0f2f5; /* 兜底背景色 */
+  color: #24292e;
 }
 
-/* 2. 标题样式 */
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3,
+/* 自定义滚动条 - 更加纤细清新 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   2. 核心 UI 组件样式 (Glassmorphism & Layout)
+   ========================================================================== */
+
+/* 核心：玻璃拟态卡片容器 */
+.glass-panel {
+  /* 基础磨砂效果 */
+  background: rgba(255, 255, 255, 0.85); /* 略微提高不透明度以保证阅读清晰度 */
+  backdrop-filter: blur(12px);
+  font-size: 20px;
+  -webkit-backdrop-filter: blur(12px);
+  
+  /* 边框与阴影 */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  border-radius: 12px; /* 统一圆角 */
+  transition: all 0.3s ease;
+}
+
+/* 侧边栏列表自定义滚动条容器 (防止滚动条太丑) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  font-size: 16px;
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+
+/* ==========================================================================
+   3. Markdown 正文排版 (Typography)
+   ========================================================================== */
+
+.markdown-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 18px; 
+  line-height: 1.7;   
+  color: #24292e;
+  word-wrap: break-word;
+  max-width: 100%; 
+  margin: 0 auto;
+}
+
+/* --- 标题样式 --- */
+.markdown-body h1 { font-size: 2.2em; }
+.markdown-body h2 { font-size: 1.8em; }
+.markdown-body h3 { font-size: 1.5em; }
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-  margin-top: 24px;
+  margin-top: 32px; /* 增加上间距，区分段落 */
   margin-bottom: 16px;
   font-weight: 600;
   line-height: 1.25;
+  color: #1f1f1f;
 }
 
 .markdown-body h1 {
-  font-size: 2em;
+  font-size: 2.2em;
   padding-bottom: 0.3em;
-  border-bottom: 1px solid #eaecef; /* 底部灰色分割线 */
+  border-bottom: 1px solid #eaecef;
 }
 
 .markdown-body h2 {
-  font-size: 1.5em;
+  font-size: 1.75em;
   padding-bottom: 0.3em;
   border-bottom: 1px solid #eaecef;
 }
 
 .markdown-body h3 {
-  font-size: 1.25em;
+  font-size: 1.4em;
 }
 
-/* 3. 段落与列表 */
+/* --- 段落与列表 --- */
 .markdown-body p {
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* 稍微增加段落间距 */
 }
 
 .markdown-body ul,
@@ -51,89 +106,233 @@
   margin-bottom: 16px;
 }
 
-/* 4. 链接样式 */
+.markdown-body li {
+  margin-bottom: 6px; /* 列表项之间增加一点空隙 */
+}
+
+/* --- 链接样式 --- */
 .markdown-body a {
-  color: #0366d6; /* 经典的 GitHub 蓝 */
+  color: #1890ff; /* 使用 Antd 蓝，比 GitHub 蓝更亮一点 */
   text-decoration: none;
+  transition: all 0.2s;
+  border-bottom: 1px solid transparent;
 }
 
 .markdown-body a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  border-bottom: 1px solid #1890ff; /* Hover 时显示下划线效果 */
 }
 
-/* 5. 引用块 (Blockquote) */
+/* ==========================================================================
+   4. 特殊元素样式 (Blockquote, Images, Tables)
+   ========================================================================== */
+
+/* --- 引用块 (Blockquote) - 风格化增强 --- */
+/* 并没有使用默认的灰色竖线，而是改为清新的蓝色背景块 */
 .markdown-body blockquote {
-  padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5; /* 左侧灰色竖条 */
-  margin: 0 0 16px 0;
+  padding: 16px 20px;
+  color: #5c6b7f;
+  background: #f0f9ff; /* 浅蓝背景 */
+  border-left: 4px solid #1890ff; /* 蓝色竖条 */
+  border-radius: 0 8px 8px 0;
+  margin: 24px 0;
+  font-style: italic;
 }
 
-/* 6. 行内代码 (如 `const a = 1`) */
-.markdown-body code {
-  padding: 0.2em 0.4em;
-  margin: 0;
-  font-size: 85%;
-  background-color: rgba(27, 31, 35, 0.05); /* 浅灰色背景 */
-  border-radius: 3px;
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+.markdown-body blockquote p:last-child {
+  margin-bottom: 0;
 }
 
-/* 7. 代码块 (```js ... ```) */
-.markdown-body pre {  
-  font-size: 85%;
-  line-height: 1.45;
-  border-radius: 6px;
-  margin-bottom: 16px;
+/* --- 图片容器 (配合 React 组件) --- */
+.md-image-wrapper {
+  text-align: center;
+  margin: 32px 0;
+  padding: 10px;
 }
 
-/* 修复代码块里的 code 不需要额外的背景色 */
-.markdown-body pre code {
-  background-color: transparent; 
-  padding: 0;
-  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace; /* 强制等宽字体 */
+.md-image-caption {
+  color: #8c8c8c;
+  font-size: 13px;
+  margin-top: 8px;
+  font-weight: 400;
 }
 
-/* 8. 图片自适应 */
+/* 图片本体 */
 .markdown-body img {
-  max-width: 100%; /* 防止大图撑破容器 */
+  max-width: 100%;
   box-sizing: content-box;
   background-color: #fff;
-  border-radius: 4px; /* 图片圆角 */
-  display: block;     /* 独占一行 */
-  margin: 16px auto;  /* 居中 */
+  border-radius: 8px; /* 更大的圆角 */
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 图片增加轻微阴影 */
 }
 
-/* 9. 表格样式 */
+/* --- 表格样式 (GitHub 风格) --- */
 .markdown-body table {
   display: block;
   width: 100%;
   overflow: auto;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   border-spacing: 0;
   border-collapse: collapse;
+  border-radius: 6px; /* 表格圆角 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03); /* 轻微阴影 */
 }
 
 .markdown-body table th,
 .markdown-body table td {
-  padding: 6px 13px;
-  border: 1px solid #dfe2e5;
+  padding: 10px 16px;
+  border: 1px solid #e1e4e8;
+}
+
+.markdown-body table th {
+  background-color: #f7f9fa;
+  font-weight: 600;
 }
 
 .markdown-body table tr {
   background-color: #fff;
-  border-top: 1px solid #c6cbd1;
 }
 
 .markdown-body table tr:nth-child(2n) {
-  background-color: #f6f8fa; /* 隔行变色 */
+  background-color: #fcfcfc;
 }
 
-/* 10. 分割线 */
+/* --- 分割线 --- */
 .markdown-body hr {
-  height: 0.25em;
+  height: 1px;
   padding: 0;
-  margin: 24px 0;
+  margin: 40px 0;
   background-color: #e1e4e8;
   border: 0;
+}
+
+/* ==========================================================================
+   5. 代码块与复制按钮 (Code & Copy)
+   ========================================================================== */
+
+/* 行内代码 */
+.markdown-body code {
+  padding: 0.2em 0.5em;
+  margin: 0 2px;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  color: #d63384; /* 醒目的玫红色，比纯黑好看 */
+  border-radius: 4px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* 代码块容器 */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* 代码块阴影 */
+}
+
+/* Pre 标签样式 */
+.markdown-body pre {  
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.5;
+  background-color: #f6f8fa; /* 浅灰背景 */
+  border-radius: 8px;
+  margin-bottom: 0; /* 由 wrapper 控制 margin */
+}
+
+.markdown-body pre code {
+  background-color: transparent; 
+  padding: 0;
+  color: inherit;
+  margin: 0;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace; 
+}
+
+/* --- 复制按钮交互逻辑 --- */
+
+/* 按钮基础样式 */
+.code-block-wrapper .ant-btn, 
+.code-block-wrapper [onClick] {
+  opacity: 0 !important;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  /* 按钮外观优化 */
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #666;
+}
+
+/* Hover 代码块时显示按钮 */
+.code-block-wrapper:hover .ant-btn,
+.code-block-wrapper:hover [onClick] {
+  opacity: 1 !important;
+}
+
+/* Hover 按钮本身 */
+.code-block-wrapper [onClick]:hover {
+  background-color: #fff !important;
+  color: #1890ff;
+  transform: translateY(-1px);
+}
+
+/* 点击反馈 */
+.code-block-wrapper [onClick]:active {
+  transform: translateY(0);
+  background-color: #f0f0f0 !important;
+}
+
+/* 移动端适配：保持按钮可见 */
+@media (max-width: 768px) {
+  .code-block-wrapper .ant-btn, 
+  .code-block-wrapper [onClick] {
+    opacity: 0.8 !important;
+  }
+}
+
+/* --- Anchor (目录) 样式优化 --- */
+
+/* 左侧竖线稍微调淡，不那么生硬 */
+.ant-anchor-ink::before {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 链接文字样式 */
+.ant-anchor-link-title {
+  font-size: 15px; /* 字体稍微小一点，显得精致 */
+  color: #666;
+  margin-bottom: 6px; /* 增加行间距 */
+}
+
+/* 选中态的文字 */
+.ant-anchor-link-active > .ant-anchor-link-title {
+  color: #1890ff !important;
+  font-weight: 600;
+  background: rgba(24, 144, 255, 0.05); /* 选中的项加一个极淡的背景 */
+  border-radius: 4px;
+  padding-left: 4px; /* 为了背景好看，稍微缩进一点 */
+  font-size: 18px;
+}
+
+/* 鼠标悬停态 */
+.ant-anchor-link-title:hover {
+  color: #1890ff;
+}
+
+/* 默认隐藏（手机端） */
+.motto-bubble {
+  display: none;
+}
+
+/* 当屏幕宽度大于 768px 时显示 */
+@media (min-width: 768px) {
+  .motto-bubble {
+    display: block !important; /* 使用 !important 确保覆盖可能存在的内联 display */
+  }
 }

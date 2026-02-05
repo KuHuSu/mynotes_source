@@ -1,15 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Menu, Avatar, Empty, Spin, Anchor, ConfigProvider, Row, Col, Card, Typography, Divider } from 'antd';
-import { UserOutlined, HomeOutlined, CalendarOutlined, FileWordOutlined } from '@ant-design/icons';
+import { Menu, Avatar, Empty, Spin, Anchor, ConfigProvider, Row, Col, Card, Typography, Divider, Image } from 'antd';
+import { UserOutlined, HomeOutlined, CalendarOutlined, FileWordOutlined, ReadOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import FileSidebar from './Compoent'; 
+import FileSidebar, { TocSidebar, NoteViewer, SiteHeader } from './Compoent'; 
 import ReactMarkdown from 'react-markdown';
 import rehypeSlug from 'rehype-slug';
+import { HomePage } from './HomePage';
 import './markdown-styles.css';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
 type fileType = {
   filename: string;
@@ -34,7 +33,6 @@ export default function RedesignedPage() {
   const [mdContent, setMdContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Use ref for the specific markdown content area now, not the whole column
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 1. Read file content
@@ -63,14 +61,23 @@ export default function RedesignedPage() {
     fetchNoteContent();
   }, [currentNote, currentKey]);
 
-  // 2. Generate TOC (Tree structure)
+  const stats = useMemo(() => {
+    const categories = Object.keys(notes);
+    // 计算分类总数 (排除 'home' 这种非真实分类，如果你 notes 里不含 home 就不需要 filter)
+    const categoryCount = categories.length;
+    
+    // 计算文章总数：把所有分类下的数组扁平化，然后取长度
+    const articleCount = Object.values(notes).flat().length;
+
+    return { categoryCount, articleCount };
+  }, [notes]);
+
+  // 2. Generate TOC
   const tocItems = useMemo(() => {
     if (!mdContent) return [];
-
     const lines = mdContent.split('\n');
     const flatItems: TocItem[] = [];
     let insideCodeBlock = false;
-
     const reg = /^(#{1,6})\s+(.+)$/;
 
     lines.forEach((line, index) => {
@@ -152,215 +159,68 @@ export default function RedesignedPage() {
     setCurrentNote(file)
   };
 
-  // --- Layout Components ---
-
-  const TopBannerSection = (
-    <div style={{
-      height: '15vh',
-      flexShrink: 0,
-      position: 'relative',
-      width: '100%',
-      zIndex: 10
-    }}>
-      <img
-        src="/img/upper.jpg"
-        alt="Top Banner"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.5 }}
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-          (e.target as HTMLImageElement).parentElement!.style.background = '#001529';
-        }}
-      />
-      <div style={{ position: 'absolute', top: 15, right: 40, zIndex: 11 }}>
-        <Avatar
-          size={120}
-          src="/img/avatar.jpg"
-          icon={<UserOutlined />}
-          style={{ border: '3px solid rgba(255,255,255,0.8)', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}
-        />
-      </div>
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, width: '100%',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(2px)'
-      }}>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[currentKey]}
-          onClick={(e) => setCurrentKey(e.key)}
-          items={menuItems}
-          style={{ justifyContent: 'center', borderBottom: 'none', background: 'transparent', lineHeight: '48px' }}
-        />
-      </div>
-    </div>
-  );
-
   const MainContentSection = (
     <div style={{
       flex: 1,
       height: 0,
       width: '100%',
-      backgroundImage: `url(/img/background_${randomBgId}.jpg)`,
+      backgroundImage: currentKey === 'home' ? 'none' : `url(/img/background_${randomBgId}.jpg)`, 
+      backgroundColor: currentKey === 'home' ? '#f0f2f5' : 'transparent', // Home 页底色
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       position: 'relative',
     }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.6)' }} />
+      {currentKey !== 'home' && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.6)' }} />}
 
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', padding: '20px 0' }}>
-        <Row style={{ height: '100%', width: '100%', margin: 0 }}>
-          <Col span={1} />
-          <Col span={22} style={{ height: '100%' }}>
-            <Row gutter={20} style={{ height: '100%' }}>
+      {currentKey === 'home' ? (
+        <HomePage 
+          categories={menuItems.filter(item => item?.key !== 'home') as any[]} 
+          onNavigate={(key) => setCurrentKey(key)}
+          avatarSrc="/img/avatar.jpg"
+          githubProfile="https://github.com/KuHuSu" 
+          projectRepo="https://github.com/KuHuSu/mynotes_source" 
+          articleCount={stats.articleCount}
+          categoryCount={stats.categoryCount}
+        />
+      ) :(<div style={{ position: 'relative', zIndex: 1, height: '100%', padding: '20px 0' }}>
+          <Row style={{ height: '100%', width: '100%', margin: 0 }}>
+            <Col span={1} />
+            <Col span={22} style={{ height: '100%' }}>
+              <Row gutter={20} style={{ height: '100%' }}>
 
-              {/* Left Sidebar */}
-              <Col span={4} style={{ height: '100%' }}>
-                <Card style={{ height: "100%", backgroundColor: 'rgba(255, 255, 255, 0.6)', border: 'none' }} bodyStyle={{ height: '100%', padding: 10 }}>
-                  {currentKey === 'home' ? (
-                     <Empty description="请选择分类" image={Empty.PRESENTED_IMAGE_SIMPLE} style={{marginTop: '50%'}} />
-                  ) : (
-                    <FileSidebar
-                      fileList={notes[currentKey]}
-                      onFileClick={handleFileClick}
-                    />
-                  )}
-                </Card>
-              </Col>
+                {/* Left Sidebar */}
+                <Col span={4} xl={4} lg={5} md={0} style={{ height: '100%', paddingLeft: 24 }}>
+                  <FileSidebar
+                    fileList={notes[currentKey]}
+                    onFileClick={handleFileClick}
+                    currentFile={currentNote}
+                  />
+                </Col>
 
-              {/* Center Content Area */}
-              <Col
-                span={16}
-                style={{ 
-                  height: '100%', 
-                  padding: '0 24px', 
-                  // Use Flexbox here to separate Header (fixed) and Content (scrollable)
-                  display: 'flex', 
-                  flexDirection: 'column' 
-                }}
-              >
-                {currentKey === 'home' ? (
-                  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                     <Empty description={<span style={{fontSize: 18}}>欢迎回到知识库</span>} />
-                  </div>
-                ) : (
-                  loading ? (
-                    <div style={{ textAlign: 'center', marginTop: 100 }}><Spin tip="加载中..." /></div>
-                  ) : mdContent ? (
-                    // This container acts as the paper sheet
-                    <div style={{ 
-                        background: 'rgba(255,255,255,0.95)', // Increased opacity for better contrast/resolution feel
-                        borderRadius: '8px', 
-                        height: '100%', 
-                        display: 'flex', 
-                        flexDirection: 'column',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)' // Subtle shadow for depth
-                    }}>
-                      
-                      {/* === Fixed Header === */}
-                      <div style={{ 
-                          padding: '24px 40px 0 40px', // Padding top/left/right
-                          flexShrink: 0,
-                          borderBottom: '1px solid #f0f0f0' 
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', color: '#555', fontSize: '15px', fontWeight: 500 }}>
-                          <span>
-                            <CalendarOutlined style={{ marginRight: 8 }} />
-                            {currentNote?.date || '未知日期'}
-                          </span>
-                          <span>
-                            <UserOutlined style={{ marginRight: 8 }} />
-                            {currentNote?.author || '未知作者'}
-                          </span>
-                        </div>
-                      </div>
+                {/* Center Content Area */}
+                <Col span={16} style={{ height: '100%', padding: '0 24px' }}>
+                  <NoteViewer 
+                    content={mdContent} 
+                    loading={loading} 
+                    currentNote={currentNote} // 传入当前笔记的元数据（作者、日期等）
+                    scrollRef={scrollContainerRef} // 传入 ref 用于滚动同步
+                  />
+                </Col>                
 
-                      {/* === Scrollable Markdown Content === */}
-                      <div 
-                        ref={scrollContainerRef} // Scroll listener is now here
-                        style={{ 
-                            flex: 1, 
-                            overflowY: 'auto', 
-                            padding: '24px 40px', // Padding for content
-                            scrollBehavior: 'smooth' 
-                        }}
-                      >
-                        <div className="markdown-body">
-                          <ReactMarkdown 
-                            rehypePlugins={[rehypeSlug]}
-                            components={{
-                              code({node, inline, className, children, ...props}: any) {
-                                const match = /language-(\w+)/.exec(className || '')
-                                return !inline && match ? (
-                                  <SyntaxHighlighter
-                                    {...props}
-                                    style={vscDarkPlus}
-                                    language={match[1]}
-                                    PreTag="div"
-                                    showLineNumbers={true}
-                                    wrapLines={true}
-                                  >
-                                    {String(children).replace(/\n$/, '')}
-                                  </SyntaxHighlighter>
-                                ) : (
-                                  <code className={className} {...props}>
-                                    {children}
-                                  </code>
-                                )
-                              }
-                            }}
-                          >
-                            {mdContent}
-                          </ReactMarkdown>
-                        </div>
-
-                        <Divider style={{ margin: '40px 0 20px 0' }} />
-
-                        {/* Footer stays at the bottom of the scrollable content */}
-                        <div style={{ textAlign: 'right', color: '#999', fontSize: '13px' }}>
-                           <FileWordOutlined style={{ marginRight: 6 }} />
-                           本篇共 {mdContent.replace(/\s+/g, '').length} 字
-                        </div>
-                      </div>
-
-                    </div>
-                  ) : (
-                    <Empty description="请在左侧选择一篇文章" style={{ marginTop: '20vh' }} />
-                  )
-                )}
-              </Col>
-
-              {/* Right Sidebar: TOC */}
-              <Col span={4} style={{ height: '100%' }}>
-                <Card
-                  title="文章大纲"
-                  size="small"
-                  style={{ height: "100%", overflowY: 'auto', backgroundColor: 'rgba(255, 255, 255, 0.6)', border: 'none' }}
-                  bodyStyle={{ padding: '10px 0' }}
-                >
-                  {currentKey !== 'home' && tocItems.length > 0 ? (
-                    <Anchor
-                      items={tocItems}
-                      getContainer={() => scrollContainerRef.current!}
-                      offsetTop={20}
-                      targetOffset={20}
-                      style={{ fontSize: '12px', background: 'transparent' }}
-                    />
-                  ) : (
-                    <Empty
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      style={{ marginTop: '10vh' }}
-                      description={<span style={{ fontSize: 14, color: '#999' }}>
-                         {currentKey === 'home' ? "等待选择" : "暂无大纲"}
-                      </span>}
-                    />
-                  )}
-                </Card>
-              </Col>
-
-            </Row>
-          </Col>
-          <Col span={1} />
-        </Row>
-      </div>
+                {/* Right Sidebar: TOC */}
+                <Col span={4} xl={4} lg={0} md={0} style={{ height: '100%', paddingRight: 24 }}>
+                  <TocSidebar 
+                    items={tocItems} 
+                    containerRef={scrollContainerRef} 
+                    hasContent={currentKey !== 'home' && !!mdContent} // 只有不在首页且有内容时才显示
+                  />
+                </Col>
+              </Row>
+            </Col>
+            <Col span={1} />
+          </Row>
+        </div>
+      )}
     </div>
   );
 
@@ -368,10 +228,11 @@ export default function RedesignedPage() {
     <ConfigProvider
       theme={{
         token: {
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', // Ensure system fonts are used
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         },
         components: {
-          Menu: { fontSize: 18, itemColor: 'black', itemSelectedColor: '#1890ff', itemHoverColor: '#1890ff', activeBarHeight: 4 },
+          Menu: { fontSize: 16, itemColor: 'rgba(0,0,0,0.7)', itemSelectedColor: '#1890ff', activeBarHeight: 3 },
+          Anchor: { linkPaddingBlock: 6, linkPaddingInlineStart: 10 } // 优化 Anchor 间距
         },
       }}
     >
@@ -382,7 +243,11 @@ export default function RedesignedPage() {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {TopBannerSection}
+        <SiteHeader 
+          currentKey={currentKey}
+          menuItems={menuItems}
+          onMenuClick={setCurrentKey}
+        />
         {MainContentSection}
       </div>
     </ConfigProvider>
