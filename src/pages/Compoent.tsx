@@ -13,9 +13,6 @@ import {
   FileTextOutlined, 
   ClockCircleOutlined,
   ReadOutlined, 
-  GithubOutlined, 
-  MailOutlined, 
-  LinkOutlined,
   CompassOutlined
 } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
@@ -23,6 +20,10 @@ import rehypeSlug from 'rehype-slug';
 import { UnorderedListOutlined } from '@ant-design/icons';
 const { Text, Title } = Typography;
 import type { MenuProps } from 'antd';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';   // 用于解析 HTML (<table> 等)
+import remarkGfm from 'remark-gfm';   // 用于解析标准 Markdown 表格 (|...|)
+import remarkMath from 'remark-math'; // 配合 katex 使用
 
 // --- 类型定义 ---
 type FileType = {
@@ -330,7 +331,8 @@ export const NoteViewer: React.FC<NoteViewerProps> = ({ content, loading, curren
       >
         <div className="markdown-body clean-typography">
           <ReactMarkdown 
-            rehypePlugins={[rehypeSlug]}
+            remarkPlugins={[remarkGfm, remarkMath]} 
+            rehypePlugins={[rehypeRaw, rehypeSlug, rehypeKatex]}
             components={{
               // 图片优化：增加圆角和阴影容器
               img: ({node, ...props}) => (

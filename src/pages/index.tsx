@@ -1,14 +1,11 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Menu, Avatar, Empty, Spin, Anchor, ConfigProvider, Row, Col, Card, Typography, Divider, Image } from 'antd';
-import { UserOutlined, HomeOutlined, CalendarOutlined, FileWordOutlined, ReadOutlined } from '@ant-design/icons';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { ConfigProvider, Row, Col } from 'antd';
+import { HomeOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import FileSidebar, { TocSidebar, NoteViewer, SiteHeader } from './Compoent'; 
-import ReactMarkdown from 'react-markdown';
-import rehypeSlug from 'rehype-slug';
 import { HomePage } from './HomePage';
 import './markdown-styles.css';
-
-const { Title, Text } = Typography;
+import 'katex/dist/katex.min.css';
 
 type fileType = {
   filename: string;
@@ -63,12 +60,8 @@ export default function RedesignedPage() {
 
   const stats = useMemo(() => {
     const categories = Object.keys(notes);
-    // 计算分类总数 (排除 'home' 这种非真实分类，如果你 notes 里不含 home 就不需要 filter)
     const categoryCount = categories.length;
-    
-    // 计算文章总数：把所有分类下的数组扁平化，然后取长度
     const articleCount = Object.values(notes).flat().length;
-
     return { categoryCount, articleCount };
   }, [notes]);
 

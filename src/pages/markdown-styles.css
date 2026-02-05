@@ -168,35 +168,69 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 图片增加轻微阴影 */
 }
 
-/* --- 表格样式 (GitHub 风格) --- */
+/* --- 表格样式 (支持 Markdown 标准表格 & HTML <table>) --- */
+
+/* 容器通用样式 */
 .markdown-body table {
-  display: block;
-  width: 100%;
-  overflow: auto;
-  margin-bottom: 24px;
+  display: table; 
+  width: 80%; 
+  max-width: 100%;
+  margin: 32px auto; 
   border-spacing: 0;
   border-collapse: collapse;
-  border-radius: 6px; /* 表格圆角 */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03); /* 轻微阴影 */
-}
-
-.markdown-body table th,
-.markdown-body table td {
-  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* 加点阴影更立体 */
   border: 1px solid #e1e4e8;
+  @media (max-width: 768px) {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
 }
 
+/* 单元格文字居中*/
 .markdown-body table th {
-  background-color: #f7f9fa;
-  font-weight: 600;
+  text-align: center;
+}
+.markdown-body table td {
+  padding: 12px 16px; /* 增加内边距，更透气 */
+  border: 1px solid #e1e4e8;
+  font-size: 15px;
 }
 
+/* 表头特定样式 */
+.markdown-body table th {
+  background-color: #f5f7fa; /* 浅灰背景 */
+  font-weight: 600;
+  color: #24292e;
+  border-bottom: 2px solid #e1e4e8; /* 表头底部加粗 */
+  white-space: nowrap; /* 表头尽量不换行 */
+}
+
+/* 斑马纹 (Zebra Striping) - 隔行变色 */
 .markdown-body table tr {
   background-color: #fff;
+  transition: background-color 0.2s;
 }
 
+/* 偶数行变色 */
 .markdown-body table tr:nth-child(2n) {
-  background-color: #fcfcfc;
+  background-color: #fafbfc;
+}
+
+/* 鼠标悬停高亮 (HTML 表格数据多时很有用) */
+.markdown-body table tr:hover {
+  background-color: #f0f9ff; /* 悬停时变为极淡的蓝色 */
+}
+
+/* --- HTML 表格特殊适配 --- */
+/* 有些 HTML 表格会直接把 img 放在 td 里，限制一下大小 */
+.markdown-body table td img {
+  max-width: 200px; 
+  max-height: 200px;
+  border-radius: 4px;
+  margin: 0; /* 去掉之前定义的全局 img margin */
+  box-shadow: none;
 }
 
 /* --- 分割线 --- */
@@ -335,4 +369,47 @@ body {
   .motto-bubble {
     display: block !important; /* 使用 !important 确保覆盖可能存在的内联 display */
   }
+}
+
+/* ==========================================================================
+   6. 数学公式 (LaTeX / KaTeX)
+   ========================================================================== */
+
+/* --- 基础设置 --- */
+/* 务必确保你已经在项目中引入了 katex.css，否则符号会乱码 */
+.markdown-body .katex {
+  font-size: 1.1em; /* 稍微放大一点，让公式符号更清晰 */
+  font-family: KaTeX_Main, "Times New Roman", serif;
+  line-height: 1.2;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- 行内公式 (Inline Math) --- */
+/* 例如 $E=mc^2$ */
+.markdown-body p .katex {
+  padding: 0 2px; /* 增加一点左右呼吸感 */
+}
+
+/* --- 整行公式 (Block Math) --- */
+/* 例如 $$ ... $$ */
+.markdown-body .katex-display {
+  display: block;
+  margin: 1.5em 0; /* 上下间距 */
+  padding: 16px 0;
+  overflow-x: auto; /* 核心：公式太长时允许横向滚动 */
+  overflow-y: hidden;
+  text-align: center; /* 默认居中 */
+  
+  /* 增加一个极其微弱的背景，突出公式区块 (可选，根据喜好保留) */
+  /* background: rgba(0, 0, 0, 0.01); */
+  /* border-radius: 8px; */
+}
+
+/* 美化公式的滚动条 */
+.markdown-body .katex-display::-webkit-scrollbar {
+  height: 4px; /* 横向滚动条高度 */
+}
+.markdown-body .katex-display::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
 }

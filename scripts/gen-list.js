@@ -14,7 +14,7 @@ if (fs.existsSync(notesDir)) {
     let categories = fs.readdirSync(notesDir);
 
     // ==========================================
-    // 🔥 新增逻辑：将 '其他' 移动到数组末尾
+    // 🔥 新增逻辑 1：将 '其他' 移动到数组末尾
     // ==========================================
     const targetDir = '其他';
     if (categories.includes(targetDir)) {
@@ -26,8 +26,6 @@ if (fs.existsSync(notesDir)) {
     categories.forEach(dirname => {
         const dirPath = path.join(notesDir, dirname);
         
-        // 确保是目录
-        // 注意：这里加个 try-catch 或许更稳健，防止系统文件权限问题，但原逻辑也没问题
         try {
             if (fs.statSync(dirPath).isDirectory()) {
                 
@@ -46,20 +44,17 @@ if (fs.existsSync(notesDir)) {
 
                     if (match) {
                         // match[1] 是第一个括号里的内容 (filename)
-                        // match[2] 是第二个括号里的内容 (date)
-                        // match[3] 是第三个括号里的内容 (author)
                         titleStr = match[1];
                         dateStr = match[2];
                         authorStr = match[3];
                     } else {
-                        // 如果文件名不符合 [A]-[B]-[C] 格式的兜底处理
+                        // 兜底处理
                         console.warn(`⚠️ 文件格式不匹配: ${file}`);
                         titleStr = rawName;
                         dateStr = '';
                         authorStr = '';
                     }
 
-                    // 生成相对路径
                     const relativePath = `/notes/${dirname}/${file}`;
 
                     result[dirname].push({
@@ -69,11 +64,32 @@ if (fs.existsSync(notesDir)) {
                         path: relativePath
                     });
                 });
+
+                // ==========================================
+                // 🔥 新增逻辑 2：将 filename 为 '介绍' 的置顶
+                // ==========================================
+                const currentList = result[dirname];
+                // 查找名字叫做 "介绍" 的笔记索引
+                const introIndex = currentList.findIndex(item => item.filename === '介绍');
+
+                // 如果找到了，并且它不在第一个位置
+                if (introIndex > 0) {
+                    // 1. 把它从数组中切出来 (splice 返回被删除元素的数组)
+                    const [introItem] = currentList.splice(introIndex, 1);
+                    // 2. 把它插到数组最前面
+                    currentList.unshift(introItem);
+                }
+                // ==========================================
             }
         } catch (err) {
-            console.error(`跳过无法读取的路径: ${dirPath}`);
+            console.error(`跳过无法读取的路径: ${dirPath}`, err);
         }
     });
+
+    // 3. 写入文件
+    fs.writeFileSync(outputFile, JSON.stringify(result, null, 2));
+    console.log(`✅ 笔记列表已生成: ${outputFile}`);
+
 } else {
     console.error(`❌ 目录不存在: ${notesDir}`);
 }
