@@ -54,7 +54,7 @@ const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string; desc
   "网络技术": { 
     icon: <GlobalOutlined />, 
     color: '#00e676', 
-    desc: '专门研究如何顺着网线过去打你。' 
+    desc: '先握手三次，再开始聊天。' 
   },
   "51汇编": { 
     icon: <ApiOutlined />, 
@@ -74,7 +74,7 @@ const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string; desc
   default: { 
     icon: <BookOutlined />, 
     color: '#607d8b', 
-    desc: '奇奇怪怪、难以分类。' 
+    desc: '杂七杂八、暂不分类。' 
   }
 };
 

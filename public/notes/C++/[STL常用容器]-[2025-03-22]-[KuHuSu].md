@@ -4,7 +4,7 @@
 
 下图2为所有的容器，以及对应支持的函数接口：
 
-![image-20250417162311624](C:\Users\18385\AppData\Roaming\Typora\typora-user-images\image-20250417162311624.png)
+![image-20250417162311624](/notes_images/image-20250417162311624.png)
 
 #### 顺序容器与关联容器
 
@@ -63,7 +63,7 @@ protected:
 
 - end_of_storage：指向数组总长度的尾部；
 
-  ![img](https://ask.qcloudimg.com/http-save/yehe-3479834/x3li0r87ql.png)
+![image-x3li0r87ql](/notes_images/x3li0r87ql.png)
 
 创建一个vector容器的时候，vector类中的这三个指针相互协调就能完成很多操作：
 
@@ -218,7 +218,7 @@ protected:
 - T* cur：指向当前访问单元格的指针；
 - T** map：中控器，指向保存子array列表指针的指针；
 
-<img src="C:\Users\18385\AppData\Roaming\Typora\typora-user-images\image-20250421201940677.png" alt="image-20250421201940677" style="zoom:50%;" />
+<img src="/notes_images/image-20250421201940677.png" alt="image-20250421201940677" style="zoom:50%;" />
 
 ##### deque成员
 
