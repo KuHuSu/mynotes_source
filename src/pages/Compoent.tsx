@@ -276,13 +276,13 @@ export const NoteViewer: React.FC<NoteViewerProps> = ({ content, loading, curren
   // --- 3. Content 状态 ---
   return (
     <div className="glass-panel" style={{ 
-      height: '100%', 
+      // height: '100%', 
       display: 'flex', 
       flexDirection: 'column', 
       background: 'rgba(255, 255, 255, 0.92)', // 提高不透明度，保证阅读体验
       boxShadow: '0 10px 40px -10px rgba(0,0,0,0.08)', // 柔和的大阴影
       position: 'relative',
-      overflow: 'hidden'
+      // overflow: 'hidden'
     }}>
       
       {/* --- 文章元数据头部 --- */}
@@ -323,7 +323,7 @@ export const NoteViewer: React.FC<NoteViewerProps> = ({ content, loading, curren
         ref={scrollRef} 
         style={{ 
           flex: 1, 
-          overflowY: 'auto', 
+          // overflowY: 'auto', 
           padding: '32px 48px 60px 48px', // 底部留白多一点
           scrollBehavior: 'smooth' 
         }}
@@ -409,7 +409,7 @@ interface TocSidebarProps {
   hasContent: boolean; // 用于判断是否显示 Empty 状态
 }
 
-export const TocSidebar: React.FC<TocSidebarProps> = ({ items, containerRef, hasContent }) => {
+export const TocSidebar: React.FC<TocSidebarProps> = ({ items, hasContent }) => {
   return (
     <div className="glass-panel" style={{ 
       height: '100%', 
@@ -433,7 +433,7 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({ items, containerRef, has
 
       {/* 2. 目录内容区域 */}
       <div 
-        className="custom-scrollbar"
+        className="custom-scrollbar hide-scrollbar" // 建议加上上一轮给你的隐藏滚动条 class
         style={{ 
           flex: 1, 
           overflowY: 'auto', 
@@ -443,12 +443,12 @@ export const TocSidebar: React.FC<TocSidebarProps> = ({ items, containerRef, has
         {hasContent && items.length > 0 ? (
           <Anchor
             items={items}
-            getContainer={() => containerRef.current!} // 绑定中间滚动区域
-            affix={false} // 因为外层已经是固定高度布局，不需要 Anchor 自带的吸顶
-            targetOffset={30} // 点击跳转时，距离顶部的偏移量，防止标题贴顶太紧
+            onClick={(e, link) => e.preventDefault()} 
+            affix={false} 
+            targetOffset={80} // 建议稍微调大一点 (比如 80)，防止全局滚动时标题被顶部的 SiteHeader 遮挡
             style={{ 
               width: '100%', 
-              backgroundColor: 'transparent' // 确保 Anchor 背景透明
+              backgroundColor: 'transparent' 
             }}
           />
         ) : (

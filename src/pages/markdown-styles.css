@@ -23,6 +23,17 @@ body {
   background: rgba(0, 0, 0, 0.25);
 }
 
+/* 隐藏侧边栏的滚动条，但依然可以用滚轮滚动 */
+.hide-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
 /* ==========================================================================
    2. 核心 UI 组件样式 (Glassmorphism & Layout)
    ========================================================================== */

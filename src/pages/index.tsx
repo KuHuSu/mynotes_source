@@ -1,6 +1,12 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { ConfigProvider, Row, Col } from 'antd';
-import { HomeOutlined } from '@ant-design/icons';
+import { ConfigProvider, Row, Col, Button, Tooltip } from 'antd';
+import { 
+  HomeOutlined, 
+  MenuFoldOutlined, 
+  MenuUnfoldOutlined, 
+  PicRightOutlined, 
+  PicCenterOutlined 
+} from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import FileSidebar, { TocSidebar, NoteViewer, SiteHeader } from './Compoent'; 
 import { HomePage } from './HomePage';
@@ -29,6 +35,8 @@ export default function RedesignedPage() {
   const [notes, setNotes] = useState<{ [key: string]: any }>({});
   const [mdContent, setMdContent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [leftExpanded, setLeftExpanded] = useState(true);
+  const [rightExpanded, setRightExpanded] = useState(true);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -152,14 +160,19 @@ export default function RedesignedPage() {
     setCurrentNote(file)
   };
 
+  const leftSpan = leftExpanded ? 4 : 0;
+  const rightSpan = rightExpanded ? 4 : 0;
+  const centerSpan = 24 - leftSpan - rightSpan;
+
   const MainContentSection = (
     <div style={{
       flex: 1,
-      height: 0,
+      // height: 0,
       width: '100%',
       backgroundImage: currentKey === 'home' ? 'none' : `url(/img/background_${randomBgId}.jpg)`, 
       backgroundColor: currentKey === 'home' ? '#f0f2f5' : 'transparent', // Home 页底色
       backgroundSize: 'cover',
+      backgroundAttachment: 'fixed',
       backgroundPosition: 'center',
       position: 'relative',
     }}>
@@ -175,14 +188,48 @@ export default function RedesignedPage() {
           articleCount={stats.articleCount}
           categoryCount={stats.categoryCount}
         />
-      ) :(<div style={{ position: 'relative', zIndex: 1, height: '100%', padding: '20px 0' }}>
-          <Row style={{ height: '100%', width: '100%', margin: 0 }}>
+      ) :(
+        <div style={{ position: 'relative', zIndex: 1, padding: '20px 0', minHeight: '100vh' }}>
+          
+          {/* 悬浮的折叠控制按钮 */}
+          <div style={{ position: 'fixed', bottom: 40, left: 40, zIndex: 10 }}>
+            <Tooltip title={leftExpanded ? "收起左侧列表" : "展开左侧列表"}>
+              <Button 
+                shape="circle" 
+                icon={leftExpanded ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />} 
+                onClick={() => setLeftExpanded(!leftExpanded)} 
+              />
+            </Tooltip>
+          </div>
+          <div style={{ position: 'fixed', bottom: 40, right: 40, zIndex: 10 }}>
+            <Tooltip title={rightExpanded ? "收起右侧目录" : "展开右侧目录"}>
+              <Button 
+                shape="circle" 
+                icon={rightExpanded ? <PicCenterOutlined /> : <PicRightOutlined />} 
+                onClick={() => setRightExpanded(!rightExpanded)} 
+              />
+            </Tooltip>
+          </div>
+
+          <Row style={{ width: '100%', margin: 0 }}>
             <Col span={1} />
-            <Col span={22} style={{ height: '100%' }}>
-              <Row gutter={20} style={{ height: '100%' }}>
+            <Col span={22}>
+              <Row gutter={20}>
 
                 {/* Left Sidebar */}
-                <Col span={4} xl={4} lg={5} md={0} style={{ height: '100%', paddingLeft: 24 }}>
+                <Col 
+                  span={leftSpan} 
+                  xl={leftSpan} lg={leftExpanded ? 5 : 0} md={0} 
+                  style={{ 
+                    display: leftExpanded ? 'block' : 'none',
+                    paddingLeft: 24,
+                    // 粘性定位，随页面滚动但停留在距离顶部 20px 的位置
+                    position: 'sticky',
+                    top: 20,
+                    height: 'calc(100vh - 40px)', // 防止侧边栏自身太长超出屏幕
+                  }}
+                  className="hide-scrollbar" // 隐藏内部滚动条的类名
+                >
                   <FileSidebar
                     fileList={notes[currentKey]}
                     onFileClick={handleFileClick}
@@ -191,21 +238,32 @@ export default function RedesignedPage() {
                 </Col>
 
                 {/* Center Content Area */}
-                <Col span={16} style={{ height: '100%', padding: '0 24px' }}>
+                <Col span={centerSpan} style={{ padding: '0 24px', transition: 'all 0.3s ease' }}>
                   <NoteViewer 
                     content={mdContent} 
                     loading={loading} 
-                    currentNote={currentNote} // 传入当前笔记的元数据（作者、日期等）
-                    scrollRef={scrollContainerRef} // 传入 ref 用于滚动同步
+                    currentNote={currentNote}
+                    scrollRef={scrollContainerRef}
                   />
                 </Col>                
 
                 {/* Right Sidebar: TOC */}
-                <Col span={4} xl={4} lg={0} md={0} style={{ height: '100%', paddingRight: 24 }}>
+                <Col 
+                  span={rightSpan} 
+                  xl={rightSpan} lg={0} md={0} 
+                  style={{ 
+                    display: rightExpanded ? 'block' : 'none',
+                    paddingRight: 24,
+                    position: 'sticky',
+                    top: 20,
+                    height: 'calc(100vh - 40px)', 
+                  }}
+                  className="hide-scrollbar"
+                >
                   <TocSidebar 
                     items={tocItems} 
                     containerRef={scrollContainerRef} 
-                    hasContent={currentKey !== 'home' && !!mdContent} // 只有不在首页且有内容时才显示
+                    hasContent={currentKey !== 'home' && !!mdContent} 
                   />
                 </Col>
               </Row>
@@ -231,8 +289,8 @@ export default function RedesignedPage() {
     >
       <div style={{
         width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
+        minHeight: '100vh',
+        // overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column'
       }}>
